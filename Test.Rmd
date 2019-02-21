@@ -1,0 +1,175 @@
+---
+title: "Sample Class"
+subtitle: "With Ryan's fancy pants new technology"
+author: "Ryan Riordan"
+date: "(updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.width = 8, 
+                      fig.height = 4.5,
+                      fig.align = 'center',
+                      out.width='95%')
+# devtools::load_all() # Travis CI fails on load_all()
+```
+
+background-image: url(https://www.queensu.ca/sites/default/files/assets/pages/QueensLogo_colour.png)
+
+???
+
+Image credit: [Queen's University](https://www.queensu.ca/sites/default/files/assets/pages/QueensLogo_colour.png)
+
+---
+class: center, middle
+
+# What is Financial Technology?
+
+### Who knows if I will even design a mini-course on this?
+
+---
+class: inverse, center, middle
+
+# Get Started
+
+---
+
+# Let's try some really live data.
+
+
+```{r echo=FALSE}
+library(tidyquant)  
+# Use FANG data set
+data("FANG") 
+# Get AAPL and AMZN Stock Prices
+end <- as_date(Sys.Date())
+AAPL <- tq_get("AAPL", get = "stock.prices", from = "2015-09-01", to = end)
+AMZN <- tq_get("AMZN", get = "stock.prices", from = "2000-01-01", to = "2016-12-31")
+AAPL %>%
+    ggplot(aes(x = date, y = close)) +
+    geom_line() +
+    labs(title = "AAPL Line Chart", y = "Closing Price", x = "") + 
+    theme_tq()
+
+```
+
+.footnote[
+[1] Here I can add a footnote. This data comes from the FANG dataset in Tidyquant. 
+]
+
+---
+
+# Let's try some really live AND interactive data.
+
+
+```{r echo=FALSE}
+library(Quandl)
+library(ggplot2)
+library(plotly)
+
+Quandl.api_key("kp4pqct3FmXWc5z79pyq")
+data <- Quandl('FSE/EON_X', start_date='2016-02-18', end_date='2019-02-20')
+
+p <- plot_ly(data, x = ~Date, y = ~Close, type = 'scatter', mode = 'lines')
+p
+```
+
+.footnote[
+[1] Note the cool data features. 
+]
+
+---
+
+# How about some data live from a Bitcoin exchange?
+
+```{r echo=FALSE}
+library(Rbitcoin)
+library (plyr)
+
+market <- "kraken"
+currency_pair <- c("BTC","EUR")
+
+ticker <- market.api.process(market, currency_pair, action='ticker')
+#ticker
+
+trades <- market.api.process(market,currency_pair,"trades")
+#trades[["trades"]][,tail(.SD,10)] # print only last 10 trades
+
+df <- ldply (trades, data.frame)
+#Rbitcoin.plot(trades)
+
+p <- plot_ly(df, x = ~date, y = ~price, type = 'scatter', mode = 'lines') %>% 
+  layout(title = "Kraken Bitcoin USD Price", 
+         xaxis = list(title = "Date and Time"),
+         yaxis = list (title = "BTCUSD"))
+p
+```
+
+.footnote[
+[1] This is all live and real time and much more powerful than I am currently expliting.  
+]
+
+---
+
+# Some cool rendered math
+
+You can write LaTeX math expressions inside a pair of dollar signs, e.g. $\alpha+\beta$. You can use the display style with double dollar signs:
+
+
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+
+---
+
+# Here is a simple regression
+
+```{r comment='#'}
+# a boring regression
+fit = lm(dist ~ 1 + speed, data = cars)
+coef(summary(fit))
+```
+
+---
+
+# Tables
+
+If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+
+```{r}
+knitr::kable(head(iris), format = 'html')
+```
+
+
+---
+
+# Here is a dynamic table
+
+```{r eval=require('DT'), tidy=FALSE, echo=FALSE}
+DT::datatable(
+  head(iris, 10),
+  fillContainer = FALSE, options = list(pageLength = 8)
+)
+```
+
+---
+class: center, middle
+
+# Video embed
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8lXdyD2Yzls" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+---
+
+# There is a tonne more but that is enough for now. 
